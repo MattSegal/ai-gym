@@ -1,9 +1,11 @@
 """
-Tabular Monte Carlo solution to frozen lake,
+Tabular Temporal Difference solution to frozen lake,
 using epsilon-greedy exploration
+
+I've implemented this wrong somewhere because it doesn't work.
 """
 import random
-import pprint
+from pprint import pprint
 
 class TDZeroAgent:
 
@@ -19,7 +21,7 @@ class TDZeroAgent:
         self.states = [s for s in range(env.observation_space.n)]
         self.actions = [a for a in range(env.action_space.n)]
         self.values = {
-            state: {action: 0.0001 * random.random() for action in self.actions}
+            state: {action: 0.1 * random.random() for action in self.actions}
             for state in self.states
         }
 
@@ -32,11 +34,18 @@ class TDZeroAgent:
         self.observation = None
         self.chosen_action = None
 
+    def observe(self, observation):
+        """
+        Observe data from envrionment
+        """
+        self.prev_observation = self.observation
+        self.observation = observation
+
     def get_next_action(self):
         """
         Select next action from action space using learned policy
         """
-        epsilon = 1.0 / float(self.episodes**0.3)
+        epsilon = 1 / self.episodes**0.3
         if random.random() > epsilon:
             # Follow greedy policy
             state = self.observation
@@ -54,20 +63,13 @@ class TDZeroAgent:
 
         self.prev_action = self.chosen_action
         self.chosen_action = chosen_action
-
         return chosen_action
-
-    def observe(self, observation):
-        """
-        Observe data from envrionment
-        """
-        self.prev_observation = self.observation
-        self.observation = observation
 
     def receive_reward(self, reward):
         """
         Keep track off all rewards
         """
+        reward *= 100
         self.episode_return += reward
 
         state = self.observation
@@ -81,7 +83,20 @@ class TDZeroAgent:
             td_error = td_target - self.values[prev_state][prev_action]
             self.values[prev_state][prev_action] += self.alpha * td_error
 
+    def print_values(self):
+        print('STATE\t\tUP(3)\t\tDOWN(1)\t\tLEFT(0)\t\tRIGHT(2)')
+        for state, actions in self.values.items():
+            print('{}\t\t{:.4f}\t\t{:.4f}\t\t{:.4f}\t\t{:.4f}'.format(
+                state,
+                actions[3],
+                actions[1],
+                actions[0],
+                actions[2],
+            ))
+
     def finish_episode(self):
-        print('Final return of ', self.episode_return, '\n')
-        # pprint.pprint(self.values)
+        """
+        Returns episode return
+        """
+        return self.episode_return
 

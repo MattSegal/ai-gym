@@ -16,26 +16,57 @@ https://gym.openai.com/envs/FrozenLake-v0/
 
     In a 4x4 grid the observation is an integer {0...15}, which
     represents the position of the agent and is the state.
+
 """
+import time
+from collections import deque
+
 import gym
 
 GYM_ENV = 'FrozenLake-v0'
+GYM_ENV = 'FrozenLakeNotSlippery-v0'
 
-def run_environment(agent, num_epsodes, max_steps):
+from gym.envs.registration import register
+register(
+    id='FrozenLakeNotSlippery-v0',
+    entry_point='gym.envs.toy_text:FrozenLakeEnv',
+    kwargs={'map_name' : '4x4', 'is_slippery': False},
+    max_episode_steps=100,
+    reward_threshold=0.78, # optimum = .8196
+)
+
+
+def run_environment(agent, num_episodes, max_steps, render=False):
     env = gym.make(GYM_ENV)
     agent.start_environment(env)
-    for k in range(num_epsodes):
+    returns = deque(maxlen=10000)
+
+    for k in range(num_episodes):
         agent.start_episode()
         observation = env.reset()
         for t in range(max_steps):
-            # env.render()
+            if render:
+                time.sleep(0.1)
+                env.render()
+
             agent.observe(observation)
             action = agent.get_next_action()
             observation, reward, done, info = env.step(action)
             agent.receive_reward(reward)
             if done:
-                # env.render()
-                msg = 'Episode {} finished after {} timesteps'
-                agent.finish_episode()
-                print(msg.format(k, t + 1))
+                if render:
+                    env.render()
+
+                episode_return = agent.finish_episode()
+                # msg = 'Episode {} finished after {} timesteps with {} return'
+                # print(msg.format(k, t + 1, episode_return))
+                returns.append(episode_return)
                 break
+
+        if (k + 1) % 1000 == 0:
+            # from pprint import pprint
+            # pprint(agent.values)
+            agent.print_values()
+            average_return = sum(returns) / float(len(returns))
+            print('Average return of ', average_return, 'in episode', k + 1)
+
