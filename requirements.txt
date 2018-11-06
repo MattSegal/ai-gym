@@ -1,3 +1,4 @@
 gym
+pytest
 # TODO - universe
 #git+git://github.com/openai/universe@master#egg=universe

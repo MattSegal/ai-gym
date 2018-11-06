@@ -1,30 +1,42 @@
 """
-Totally random agent
+Base agent for running in a discrete environment
 """
 import random
 
-class RandomAgent:
+
+class BaseAgent:
+
+    def __init__(self, gamma=0, alpha=0, lambd=0):
+        self.gamma = gamma
+        self.alpha = alpha
+        self.lambd = lambd
+        self.episodes = 0
 
     def start_environment(self, env):
         """
         Setup observation space
         """
+        self.states = [s for s in range(env.observation_space.n)]
         self.actions = [a for a in range(env.action_space.n)]
 
     def start_episode(self):
         """
         Reset rewards so that we can calculate return for this episode
         """
+        self.episodes += 1
         self.episode_return = 0
+
+    def observe(self, observation):
+        """
+        Observe data from envrionment
+        """
+        pass
 
     def get_next_action(self):
         """
-        Select next action randomly
+        Select next action from action space using learned policy
         """
         return random.choice(self.actions)
-
-    def observe(self, observation):
-        pass
 
     def receive_reward(self, reward):
         """
@@ -32,7 +44,13 @@ class RandomAgent:
         """
         self.episode_return += reward
 
-    def finish_episode(self):
+    def print_values(self):
+        """
+        Print value function for debugging
+        """
+        pass
+
+    def finish_episode(self, final_observation):
         """
         Returns episode return
         """

@@ -6,6 +6,7 @@ I've implemented this wrong somewhere because it doesn't work.
 """
 import random
 
+
 class MonteCarloAgent:
 
     def __init__(self, alpha):
