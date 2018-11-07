@@ -46,9 +46,13 @@ class BaseAgent:
 
     def print_values(self):
         """
-        Print value function for debugging
+        Print tabular value function as a table for debugging
         """
-        pass
+        values = getattr(self, 'values', {})
+        print('\t\t'.join(['STATE', *[str(a) for a in self.actions]]))
+        for state, actions in values.items():
+            sorted_actions = [actions[a] for a in self.actions]
+            print('\t\t'.join(['{}'] + ['{:.2f}' for _ in self.actions]).format(state, *sorted_actions))
 
     def finish_episode(self, final_observation):
         """

@@ -3,7 +3,7 @@ Tabular TD-Lambda solution to frozen lake,
 using epsilon-greedy exploration
 """
 import random
-from base_agent import BaseAgent
+from .base_agent import BaseAgent
 
 
 class TDLambdaAgent(BaseAgent):

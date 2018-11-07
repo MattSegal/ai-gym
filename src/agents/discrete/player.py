@@ -1,7 +1,7 @@
 """
 Player controls with arrow key
 """
-from base_agent import BaseAgent
+from .base_agent import BaseAgent
 
 KEY_MAP = {
    'a': 0,

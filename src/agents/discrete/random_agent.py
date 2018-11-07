@@ -1,6 +1,7 @@
 """
 Totally random agent
 """
+from .base_agent import BaseAgent
 
 
 class RandomAgent(BaseAgent):
