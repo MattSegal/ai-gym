@@ -15,9 +15,9 @@ class TDZeroAgent(BaseAgent):
         Setup observation space
         """
         super().start_environment(env)
-        # Initialize sate-action values optimistically
+        # Initialize sate-action values somewhat optimistically
         self.values = {
-            state: {action: 1 for action in self.actions}
+            state: {action: 0.5 for action in self.actions}
             for state in self.states
         }
 
