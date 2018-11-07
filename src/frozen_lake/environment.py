@@ -23,8 +23,8 @@ from collections import deque
 
 import gym
 
-GYM_ENV = 'FrozenLake-v0'
-# GYM_ENV = 'FrozenLakeNotSlippery-v0'
+# GYM_ENV = 'FrozenLake-v0'
+GYM_ENV = 'FrozenLakeNotSlippery-v0'
 
 from gym.envs.registration import register
 register(
@@ -38,6 +38,16 @@ register(
 REPORT_PERIOD = 1000
 SOLVED = 1
 
+def display(env, agent, t, k):
+    print('EPISODE:\t', k)
+    print('TIME:\t\t', t)
+    print('EPSILON:\t', max(0.1, 1 / agent.episodes**0.5))
+    agent.print_values()
+    env.render()
+    # time.sleep(1)
+    input()
+
+
 def run_environment(agent, num_episodes, max_steps, render=False):
     env = gym.make(GYM_ENV)
     agent.start_environment(env)
@@ -48,27 +58,26 @@ def run_environment(agent, num_episodes, max_steps, render=False):
         observation = env.reset()
         for t in range(max_steps):
             if render:
-                time.sleep(0.1)
-                env.render()
+                display(env, agent, t, k)
 
             agent.observe(observation)
             action = agent.get_next_action()
             observation, reward, done, info = env.step(action)
+
+            if render:
+                # Clear screen
+                print(chr(27) + "[2J")
+
             agent.receive_reward(reward)
             if done:
                 if render:
-                    env.render()
+                    display(env, agent, t, k)
 
                 episode_return = agent.finish_episode(observation)
-                # msg = 'Episode {} finished after {} timesteps with {} return'
-                # print(msg.format(k, t + 1, episode_return))
                 returns.append(episode_return)
                 break
 
         if (k + 1) % REPORT_PERIOD == 0:
-            # from pprint import pprint
-            # pprint(agent.values)
-            agent.print_values()
             average_return = sum(returns) / float(len(returns))
             print('Average return of ', average_return, 'in episode', k + 1)
             if average_return >= SOLVED:

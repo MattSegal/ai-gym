@@ -49,6 +49,9 @@ class BaseAgent:
         Print tabular value function as a table for debugging
         """
         values = getattr(self, 'values', {})
+        action_names = getattr(self, 'ACTION_NAMES')
+        if action_names:
+            print('\t\t' + '\t\t'.join(action_names))
         print('\t\t'.join(['STATE', *[str(a) for a in self.actions]]))
         for state, actions in values.items():
             sorted_actions = [actions[a] for a in self.actions]

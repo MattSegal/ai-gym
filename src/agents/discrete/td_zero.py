@@ -8,6 +8,8 @@ from .base_agent import BaseAgent
 
 class TDZeroAgent(BaseAgent):
 
+    ACTION_NAMES = ['LEFT', 'DOWN', 'RIGHT', 'UP']
+
     def start_environment(self, env):
         """
         Setup observation space
@@ -24,25 +26,24 @@ class TDZeroAgent(BaseAgent):
         Reset rewards so that we can calculate return for this episode
         """
         super().start_episode()
-        self.observation = None
-        self.chosen_action = None
+        self.obs, self.prev_obs = None, None
+        self.action, self.prev_action = None, None
         self.reward = None
 
-    def observe(self, observation):
+    def observe(self, new_obs):
         """
         Observe data from envrionment
         """
-        self.prev_observation = self.observation
-        self.observation = observation
+        self.obs, self.prev_obs = new_obs, self.obs
 
     def get_next_action(self):
         """
         Select next action from action space using learned policy
         """
-        epsilon = max(0.1, 1 / self.episodes**0.5)
+        epsilon = max(0.01, 1 / self.episodes**0.4)
         if random.random() >= epsilon:
             # Follow greedy policy
-            state = self.observation
+            state = self.obs
             best_action = None
             best_value = float('-inf')
             for possible_action in self.actions:
@@ -50,55 +51,54 @@ class TDZeroAgent(BaseAgent):
                     best_value = self.values[state][possible_action]
                     best_action = possible_action
 
-            chosen_action = best_action
+            action = best_action
         else:
             # Follow random policy
-            chosen_action = random.choice(self.actions)
+            action = random.choice(self.actions)
 
-        self.prev_action = self.chosen_action
-        self.chosen_action = chosen_action
-        return chosen_action
+        self.action, self.prev_action = action, self.action
+        return action
 
     def receive_reward(self, reward):
         """
         Keep track off all rewards
         """
         super().receive_reward(reward)
+        self.reward, prev_reward = reward, self.reward
+        state, prev_state = self.obs, self.prev_obs
+        action, prev_action = self.action, self.prev_action
+        should_update  = not any([x is None for x in (prev_action, prev_state, prev_reward)])
 
-        prev_reward = self.reward
-        self.reward = reward
+        prev_val = self.values[prev_state][prev_action] if should_update else None
+        td_target = None
+        td_error = None
 
-        state = self.observation
-        prev_state = self.prev_observation
-
-        action = self.chosen_action
-        prev_action = self.prev_action
-
-        should_update_previous_action  = (
-            prev_action is not None and
-            prev_state is not None and
-            prev_reward is not None
-        )
-        if should_update_previous_action:
+        if should_update:
             td_target = prev_reward + self.gamma * self.values[state][action]
             td_error = td_target - self.values[prev_state][prev_action]
             self.values[prev_state][prev_action] += self.alpha * td_error
-            # print('\nReward: ', prev_reward)
-            # print('TD target: ', td_target)
-            # print('TD error: ', td_error)
-            # print('TD update: ', self.alpha * td_error)
-            # print('New value', self.values[prev_state][prev_action])
 
-    def finish_episode(self, final_observation):
+        # print('\nUpdating:\t', prev_state, '/', prev_action)
+        # print('Target:\t\t', state, '/', action)
+        # print('Reward:\t\t', prev_reward)
+        # print('TD target:\t', td_target)
+        # print('TD error:\t', td_error)
+        # print('TD update:\t', self.alpha * td_error if td_error else None)
+        # print('Prev value:\t', prev_val)
+        # print('New value\t', self.values[prev_state][prev_action] if should_update else None)
+
+    def finish_episode(self, final_obs):
         """
         Perform final update for end of episode
         Returns episode return
         """
         # Set value of all actions for terminal state to zero.
-        self.observe(final_observation)
-        self.values[final_observation] = {action: 0 for action in self.actions}
+        # And then take a dummy action
+        self.observe(final_obs)
+        self.values[final_obs] = {action: 0 for action in self.actions}
+        self.get_next_action()
         # Perform final TD update.
         self.receive_reward(0)
         # self.print_values()
-        return super().finish_episode(final_observation)
+        return super().finish_episode(final_obs)
 

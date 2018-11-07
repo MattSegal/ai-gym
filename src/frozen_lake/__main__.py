@@ -16,24 +16,20 @@ Run an agent in the Frozen Lake environment
     I can be solved in as few as 85 episodes.
 
 """
-from environment import run_environment
-from monte_carlo import MonteCarloAgent
-from td_lambda import TDLambdaAgent
-from td_zero import TDZeroAgent
-from player import PlayerAgent
-from random_agent import RandomAgent
+from .. import agents
+from .environment import run_environment
 
 NUM_EPISODES = 100 * 1000
 MAX_STEPS = 100
 GAMMA = 0.9 # How valuable is the expectation of future rewards?
-ALPHA = 0.1  # How much do you trust this sample?
+ALPHA = 0.5  # How much do you trust this sample?
 LAMBDA = 0.5  # How much do we prefer accuracy/high bias vs variance/low bias
               # At 1 we are doing Monte Carlo
               # At 0 we are doing TD(0)
 
 # agent = MonteCarloAgent(ALPHA)
-# agent = TDZeroAgent(GAMMA, ALPHA)
-agent = TDLambdaAgent(GAMMA, ALPHA, LAMBDA)
+agent = agents.discrete.TDZeroAgent(GAMMA, ALPHA)
+# agent = TDLambdaAgent(GAMMA, ALPHA, LAMBDA)
 # agent = PlayerAgent()
 # agent = RandomAgent()
 
