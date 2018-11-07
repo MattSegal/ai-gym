@@ -1,5 +1,5 @@
 """
-Check that agents learn  basic MDPs
+Veify that agents learn basic MDPs
 """
 from gym.envs.toy_text import discrete
 
@@ -66,10 +66,11 @@ def run_two_doors(agent, env, num_episodes):
 
 def test_two_doors_deterministic__td_zero():
     """
-    Basic test to see if agent learns to open the correct doors.
+    Basic test to see if agent learns to open the correct doors
+    in a fully deterministic environment.
     """
-    NUM_EPISODES = 1000
-    GAMMA, ALPHA = 1, 0.4
+    NUM_EPISODES = 10000
+    GAMMA, ALPHA = 1, 1
     ERROR = 0.05
     test_cases = [
         {
@@ -95,18 +96,6 @@ def test_two_doors_deterministic__td_zero():
             'p_left': 0,
             'p_right': 0,
             'expected':  {START: {LEFT: 0, RIGHT: 0}, END: {LEFT: 0, RIGHT: 0}}
-        },
-                {
-            'name': 'Agent should choose randomly (both 0.5)',
-            'p_left': 0.5,
-            'p_right': 0.5,
-            'expected':  {START: {LEFT: 0.5, RIGHT: 0.5}, END: {LEFT: 0, RIGHT: 0}}
-        },
-        {
-            'name': 'Agent should prefer left',
-            'p_left': 0.7,
-            'p_right': 0.3,
-            'expected':  {START: {LEFT: 0.7, RIGHT: 0.3}, END: {LEFT: 0, RIGHT: 0}}
         },
     ]
 

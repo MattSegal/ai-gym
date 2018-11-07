@@ -64,7 +64,6 @@ class TDZeroAgent(BaseAgent):
         Keep track off all rewards
         """
         super().receive_reward(reward)
-        # print('received reward', reward)
 
         prev_reward = self.reward
         self.reward = reward
@@ -84,6 +83,11 @@ class TDZeroAgent(BaseAgent):
             td_target = prev_reward + self.gamma * self.values[state][action]
             td_error = td_target - self.values[prev_state][prev_action]
             self.values[prev_state][prev_action] += self.alpha * td_error
+            # print('\nReward: ', prev_reward)
+            # print('TD target: ', td_target)
+            # print('TD error: ', td_error)
+            # print('TD update: ', self.alpha * td_error)
+            # print('New value', self.values[prev_state][prev_action])
 
     def finish_episode(self, final_observation):
         """
