@@ -15,7 +15,7 @@ class TDZeroAgent(BaseAgent):
         Setup observation space
         """
         super().start_environment(env)
-        # Initialize sate-action values somewhat optimistically
+        # Initialize state-action values somewhat optimistically
         self.values = {
             state: {action: 0.5 for action in self.actions}
             for state in self.states
@@ -40,21 +40,14 @@ class TDZeroAgent(BaseAgent):
         """
         Select next action from action space using learned policy
         """
-        epsilon = max(0.01, 1 / self.episodes**0.4)
+        epsilon = max(0.05, 1 / self.episodes**0.4)
         if random.random() >= epsilon:
             # Follow greedy policy
             state = self.obs
-            best_action = None
-            best_value = float('-inf')
-            for possible_action in self.actions:
-                if self.values[state][possible_action] > best_value:
-                    best_value = self.values[state][possible_action]
-                    best_action = possible_action
-
-            action = best_action
+            action = self.get_action_greedily(state)
         else:
             # Follow random policy
-            action = random.choice(self.actions)
+            action = self.get_action_randomly()
 
         self.action, self.prev_action = action, self.action
         return action
@@ -99,6 +92,5 @@ class TDZeroAgent(BaseAgent):
         self.get_next_action()
         # Perform final TD update.
         self.receive_reward(0)
-        # self.print_values()
         return super().finish_episode(final_obs)
 

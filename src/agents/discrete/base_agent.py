@@ -36,6 +36,20 @@ class BaseAgent:
         """
         Select next action from action space using learned policy
         """
+        return self.get_action_randomly()
+
+    def get_action_greedily(self, state):
+        best_action = None
+        best_value = float('-inf')
+        for possible_action in self.actions:
+            action_value = self.values[state][possible_action]
+            if action_value > best_value:
+                best_value = self.values[state][possible_action]
+                best_action = possible_action
+
+        return best_action
+
+    def get_action_randomly(self):
         return random.choice(self.actions)
 
     def receive_reward(self, reward):
