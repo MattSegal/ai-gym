@@ -1,8 +1,6 @@
 """
 Tabular Monte Carlo solution to frozen lake,
 using epsilon-greedy exploration
-
-I've implemented this wrong somewhere because it doesn't work.
 """
 import random
 from .base_agent import BaseAgent
@@ -68,16 +66,22 @@ class MonteCarloAgent(BaseAgent):
         self.rewards.append(reward)
 
     def finish_episode(self, final_obs):
-        # Calculate episode returns from time T to 1
         num_timesteps = len(self.rewards)
+
+        # Calculate episode returns from time T-1 to 0
+        # The episode return for timestep t is the return that was
+        # collected from timestep t onwards.
         episode_returns = []
+        return_t = 0
         for t in reversed(range(num_timesteps)):
-            prev_reward = self.rewards[t - 1] if t < num_timesteps - 1 else 0
             reward = self.rewards[t]
-            return_t = reward + self.alpha * prev_reward
+            return_t = reward + self.gamma * return_t
             episode_returns.append(return_t)
 
-        # Run through states from time 0 to T
+        # Reverse returns so it is indexed from 0 to T-1
+        episode_returns = list(reversed(episode_returns))
+
+        # Run through states from time 0 to T-1
         for t in range(num_timesteps):
             state_t, action_t = self.visited[t]
             return_t = episode_returns[t]

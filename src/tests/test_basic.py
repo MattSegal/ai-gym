@@ -154,25 +154,25 @@ def test_two_doors_deterministic__monte_carlo():
     Ensure Monte Carlo works in a deterministic 2 door env.
     """
     NUM_EPISODES = 100
-    ALPHA = 1
+    GAMMA = 1
     ERROR = 0.01
     def get_agent():
-        return agents.discrete.MonteCarloAgent(ALPHA)
+        return agents.discrete.MonteCarloAgent(GAMMA)
 
     assert_two_doors_deterministic(get_agent, NUM_EPISODES, ERROR)
 
 
-# def test_two_doors_stochastic__td_lambda():
-#     """
-#     Ensure TD Lambda works in a stochastic 2 door env.
-#     """
-#     NUM_EPISODES = 10000
-#     GAMMA, ALPHA, LAMBDA = 1, 0.05, 0.5
-#     ERROR = 0.2  # We're being pretty generous here
-#     def get_agent():
-#         return agents.discrete.TDLambdaAgent(GAMMA, ALPHA, LAMBDA)
+def test_two_doors_stochastic__monte_carlo():
+    """
+    Ensure Monte Carlo works in a stochastic 2 door env.
+    """
+    NUM_EPISODES = 10000
+    GAMMA = 1
+    ERROR = 0.1  # We're being pretty generous here
+    def get_agent():
+        return agents.discrete.MonteCarloAgent(GAMMA)
 
-#     assert_two_doors_stochastic(get_agent, NUM_EPISODES, ERROR)
+    assert_two_doors_stochastic(get_agent, NUM_EPISODES, ERROR)
 
 
 def test_two_doors_deterministic__td_zero():

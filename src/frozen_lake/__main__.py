@@ -60,10 +60,10 @@ register(
 
 
 def main():
-    # agent = MonteCarloAgent(ALPHA)
+    # agent = agents.discrete.MonteCarloAgent(GAMMA)
     # agent = agents.discrete.TDZeroAgent(GAMMA, ALPHA)
     agent = agents.discrete.TDLambdaAgent(GAMMA, ALPHA, LAMBDA)
-    # agent = PlayerAgent()
+    # agent = agents.discrete.PlayerAgent()
     # agent = agents.discrete.RandomAgent()
     run_environment(agent, NUM_EPISODES, MAX_STEPS, render=False)
 
