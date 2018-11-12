@@ -89,4 +89,4 @@ class MonteCarloAgent(BaseAgent):
             error_t =  return_t - self.values[state_t][action_t]
             self.values[state_t][action_t] += (1 / self.visits[state_t][action_t]) * error_t
 
-        return episode_returns[-1]
+        return 0 # is this meaningful?
